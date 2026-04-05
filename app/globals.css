@@ -17,6 +17,47 @@
   --foreground: #f5f0e8;
 }
 
+/* ── Light theme ── */
+[data-theme="light"] {
+  --void: #f8f5f0;
+  --charcoal: #ede8e0;
+  --surface: #f0ece4;
+  --surface-2: #e8e2d8;
+  --border: rgba(187, 35, 25, 0.1);
+  --ivory: #1a1410;
+  --ivory-dim: #3d3428;
+  --steel: #6b5e4e;
+  --background: #f8f5f0;
+  --foreground: #1a1410;
+  --gold: #8a6820;
+  --gold-light: #a07d28;
+}
+
+[data-theme="light"] body {
+  background: var(--void);
+  color: var(--ivory);
+}
+
+[data-theme="light"] .grain { opacity: 0.015; }
+
+[data-theme="light"] .service-card {
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+
+[data-theme="light"] .field {
+  color: var(--ivory);
+  border-bottom-color: rgba(26,20,16,0.2);
+}
+[data-theme="light"] .field::placeholder { color: rgba(26,20,16,0.35); }
+[data-theme="light"] .field option { background: #fff; color: var(--ivory); }
+
+[data-theme="light"] .kanban-col { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+[data-theme="light"] .kanban-item { background: #f8f5f0; }
+
+[data-theme="light"] ::-webkit-scrollbar-track { background: var(--void); }
+[data-theme="light"] ::selection { background: var(--crimson); color: #fff; }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--void); }
 body {
