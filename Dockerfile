@@ -2,6 +2,7 @@ FROM node:20-slim AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
+COPY BUILD_VERSION .
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build

@@ -6,7 +6,7 @@ import { getToken, clearToken } from "@/lib/auth";
 import { useLang } from "@/lib/i18n/LangContext";
 import Link from "next/link";
 import Image from "next/image";
-import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings } from "lucide-react";
+import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings, Images } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -31,6 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/kanban", label: t.admin.kanban, icon: <Kanban size={16} /> },
     { href: "/admin/crm", label: t.admin.crm, icon: <Users size={16} /> },
     { href: "/admin/appointments", label: t.admin.appointments, icon: <CalendarDays size={16} /> },
+    { href: "/admin/portfolio", label: t.admin.portfolio, icon: <Images size={16} /> },
     { href: "/admin/content", label: t.admin.content, icon: <FileText size={16} /> },
     { href: "/admin/settings", label: t.admin.settings, icon: <Settings size={16} /> },
   ];

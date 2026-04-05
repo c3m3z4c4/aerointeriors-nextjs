@@ -2,31 +2,53 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n/LangContext";
-import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-const GALLERY = [
-  { src: "/assets/pics/webp/20190701_111200.webp", aspect: "portrait" },
-  { src: "/assets/pics/webp/20190701_111212.webp", aspect: "landscape" },
-  { src: "/assets/pics/webp/20190701_111218.webp", aspect: "square" },
-  { src: "/assets/pics/webp/20190701_111232.webp", aspect: "portrait" },
-  { src: "/assets/pics/webp/20190701_111251.webp", aspect: "landscape" },
-  { src: "/assets/pics/webp/20190701_111304.webp", aspect: "square" },
-  { src: "/assets/pics/webp/20190701_111311.webp", aspect: "portrait" },
-  { src: "/assets/pics/webp/20190701_111324.webp", aspect: "landscape" },
-  { src: "/assets/pics/webp/20190701_111357.webp", aspect: "square" },
-  { src: "/assets/pics/webp/20190701_111414.webp", aspect: "portrait" },
-  { src: "/assets/pics/webp/20190701_111427.webp", aspect: "landscape" },
-  { src: "/assets/pics/webp/20190701_161734.webp", aspect: "square" },
-  { src: "/assets/pics/webp/20190701_161810.webp", aspect: "portrait" },
-  { src: "/assets/pics/webp/20190701_161812.webp", aspect: "landscape" },
-  { src: "/assets/pics/webp/20190701_165842.webp", aspect: "square" },
+const FALLBACK = [
+  "/assets/pics/webp/20190701_111200.webp",
+  "/assets/pics/webp/20190701_111212.webp",
+  "/assets/pics/webp/20190701_111218.webp",
+  "/assets/pics/webp/20190701_111232.webp",
+  "/assets/pics/webp/20190701_111251.webp",
+  "/assets/pics/webp/20190701_111304.webp",
+  "/assets/pics/webp/20190701_111311.webp",
+  "/assets/pics/webp/20190701_111324.webp",
+  "/assets/pics/webp/20190701_111357.webp",
+  "/assets/pics/webp/20190701_111414.webp",
+  "/assets/pics/webp/20190701_111427.webp",
+  "/assets/pics/webp/20190701_161734.webp",
+  "/assets/pics/webp/20190701_161810.webp",
+  "/assets/pics/webp/20190701_161812.webp",
+  "/assets/pics/webp/20190701_165842.webp",
 ];
 
+const API = process.env.NEXT_PUBLIC_API_URL || "";
+const ORG = process.env.NEXT_PUBLIC_ORG_ID || "";
+
+type Project = { id: string; title_en: string; title_es: string; description_en: string; description_es: string; images: string[]; category: string; aircraftType: string; year: number; visible: boolean };
+
 export default function Gallery() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API}/api/projects?orgId=${ORG}`)
+      .then(r => r.ok ? r.json() : [])
+      .then((data: Project[]) => { setProjects(data.filter(p => p.visible)); setLoaded(true); })
+      .catch(() => setLoaded(true));
+  }, []);
+
+  // Build flat image list from projects, or fall back
+  const images: { src: string; title?: string; desc?: string }[] = loaded && projects.length > 0
+    ? projects.flatMap(p => p.images.map((src, i) => ({
+        src,
+        title: i === 0 ? (lang === "es" ? p.title_es : p.title_en) : undefined,
+        desc: i === 0 ? (lang === "es" ? p.description_es : p.description_en) : undefined,
+      })))
+    : FALLBACK.map(src => ({ src }));
 
   useEffect(() => {
     const els = sectionRef.current?.querySelectorAll(".reveal") ?? [];
@@ -36,19 +58,18 @@ export default function Gallery() {
     );
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [images.length]);
 
-  // Keyboard lightbox nav
   useEffect(() => {
     if (lightbox === null) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightbox(null);
-      if (e.key === "ArrowRight") setLightbox((p) => (p !== null ? (p + 1) % GALLERY.length : null));
-      if (e.key === "ArrowLeft") setLightbox((p) => (p !== null ? (p - 1 + GALLERY.length) % GALLERY.length : null));
+      if (e.key === "ArrowRight") setLightbox(p => p !== null ? (p + 1) % images.length : null);
+      if (e.key === "ArrowLeft") setLightbox(p => p !== null ? (p - 1 + images.length) % images.length : null);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightbox]);
+  }, [lightbox, images.length]);
 
   return (
     <section id="gallery" ref={sectionRef} style={{ padding: "120px 0" }}>
@@ -61,12 +82,7 @@ export default function Gallery() {
                 {t.gallery.label}
               </span>
             </div>
-            <h2 className="reveal" style={{
-              fontFamily: "var(--font-cormorant, serif)",
-              fontSize: "clamp(2.2rem, 5vw, 4rem)",
-              fontWeight: 300, fontStyle: "italic",
-              color: "var(--ivory)", margin: 0,
-            }}>
+            <h2 className="reveal" style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 300, fontStyle: "italic", color: "var(--ivory)", margin: 0 }}>
               {t.gallery.title}
             </h2>
           </div>
@@ -76,54 +92,34 @@ export default function Gallery() {
         </div>
 
         {/* Masonry grid */}
-        <div style={{
-          columns: "4 220px",
-          gap: "8px",
-        }}>
-          {GALLERY.map((img, i) => (
+        <div style={{ columns: "4 220px", gap: "8px" }}>
+          {images.map((img, i) => (
             <div
               key={i}
               className="reveal"
               onClick={() => setLightbox(i)}
-              style={{
-                breakInside: "avoid",
-                marginBottom: "8px",
-                position: "relative",
-                overflow: "hidden",
-                cursor: "pointer",
-                transitionDelay: `${(i % 4) * 0.06}s`,
-              }}
+              style={{ breakInside: "avoid", marginBottom: "8px", position: "relative", overflow: "hidden", cursor: "pointer", transitionDelay: `${(i % 4) * 0.06}s` }}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={img.src}
-                alt={`Gallery ${i + 1}`}
-                width={400}
-                height={img.aspect === "portrait" ? 540 : img.aspect === "landscape" ? 300 : 400}
-                style={{
-                  width: "100%", height: "auto",
-                  display: "block",
-                  transition: "transform 0.6s cubic-bezier(0.23,1,0.32,1)",
-                }}
-                sizes="(max-width: 768px) 50vw, 25vw"
+                alt={img.title || `Gallery ${i + 1}`}
+                style={{ width: "100%", height: "auto", display: "block", transition: "transform 0.6s cubic-bezier(0.23,1,0.32,1)" }}
+                loading="lazy"
               />
               {/* Hover overlay */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "rgba(187,35,25,0.0)",
-                transition: "background 0.4s",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}
+              <div
+                style={{ position: "absolute", inset: 0, background: "rgba(187,35,25,0.0)", transition: "background 0.4s", display: "flex", alignItems: "flex-end", padding: "12px" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "rgba(187,35,25,0.25)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = "rgba(187,35,25,0)"; }}
               >
-                <div style={{
-                  width: "36px", height: "36px", border: "1px solid var(--ivory)",
-                  borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                  opacity: 0, transform: "scale(0.7)",
-                  transition: "opacity 0.3s, transform 0.3s",
-                }}>
-                  <span style={{ fontSize: "14px", color: "var(--ivory)" }}>+</span>
-                </div>
+                {img.title && (
+                  <div style={{ fontSize: "11px", color: "var(--ivory)", letterSpacing: "0.08em", textShadow: "0 1px 4px rgba(0,0,0,0.8)", opacity: 0, transition: "opacity 0.3s" }}
+                    className="gallery-caption"
+                  >
+                    {img.title}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -133,46 +129,31 @@ export default function Gallery() {
       {/* Lightbox */}
       {lightbox !== null && (
         <div
-          style={{
-            position: "fixed", inset: 0, zIndex: 9999,
-            background: "rgba(10,8,5,0.96)", backdropFilter: "blur(20px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(10,8,5,0.96)", backdropFilter: "blur(20px)", display: "flex", alignItems: "center", justifyContent: "center" }}
           onClick={() => setLightbox(null)}
         >
-          <button
-            style={{ position: "absolute", top: "24px", right: "28px", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }}
-            onClick={() => setLightbox(null)}
-          >
+          <button style={{ position: "absolute", top: "24px", right: "28px", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }} onClick={() => setLightbox(null)}>
             <X size={24} />
           </button>
-          <button
-            style={{ position: "absolute", left: "24px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }}
-            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + GALLERY.length) % GALLERY.length); }}
-          >
+          <button style={{ position: "absolute", left: "24px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }}
+            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + images.length) % images.length); }}>
             <ChevronLeft size={32} />
           </button>
-          <div
-            style={{ maxWidth: "90vw", maxHeight: "90vh", position: "relative" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={GALLERY[lightbox].src}
-              alt="Gallery"
-              width={1200}
-              height={800}
-              style={{ maxWidth: "90vw", maxHeight: "88vh", width: "auto", height: "auto", objectFit: "contain" }}
-            />
+          <div style={{ maxWidth: "90vw", maxHeight: "90vh", position: "relative" }} onClick={e => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={images[lightbox].src} alt="" style={{ maxWidth: "90vw", maxHeight: "80vh", width: "auto", height: "auto", objectFit: "contain" }} />
+            {images[lightbox].title && (
+              <div style={{ marginTop: "12px", textAlign: "center", color: "var(--ivory)", fontSize: "13px", letterSpacing: "0.1em" }}>
+                {images[lightbox].title}
+              </div>
+            )}
           </div>
-          <button
-            style={{ position: "absolute", right: "24px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }}
-            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % GALLERY.length); }}
-          >
+          <button style={{ position: "absolute", right: "24px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--ivory)", cursor: "pointer", zIndex: 2 }}
+            onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % images.length); }}>
             <ChevronRight size={32} />
           </button>
-          {/* Counter */}
           <div style={{ position: "absolute", bottom: "24px", left: "50%", transform: "translateX(-50%)", color: "var(--steel)", fontSize: "12px", letterSpacing: "0.15em" }}>
-            {lightbox + 1} / {GALLERY.length}
+            {lightbox + 1} / {images.length}
           </div>
         </div>
       )}

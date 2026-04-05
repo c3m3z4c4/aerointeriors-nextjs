@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n/LangContext";
-import Image from "next/image";
 
-const PHOTOS = [
+const FALLBACK_PHOTOS = [
   "/assets/pics/webp/20190701_161734.webp",
   "/assets/pics/webp/20190701_161810.webp",
   "/assets/pics/webp/20190701_161812.webp",
@@ -18,9 +17,31 @@ const PHOTOS = [
 
 const NUMBERS = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];
 
+const API = process.env.NEXT_PUBLIC_API_URL || "";
+const ORG = process.env.NEXT_PUBLIC_ORG_ID || "";
+
+type ApiService = { id: string; title_en: string; title_es: string; description_en: string; description_es: string; icon: string; image?: string; order: number; visible: boolean };
+
 export default function Services() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [apiServices, setApiServices] = useState<ApiService[]>([]);
+
+  useEffect(() => {
+    fetch(`${API}/api/services?orgId=${ORG}`)
+      .then(r => r.ok ? r.json() : [])
+      .then((data: ApiService[]) => setApiServices(data.filter(s => s.visible)))
+      .catch(() => {});
+  }, []);
+
+  // Use API data if available, else fall back to translations
+  const items = apiServices.length > 0
+    ? apiServices.map(s => ({
+        title: lang === "es" ? s.title_es : s.title_en,
+        desc: lang === "es" ? s.description_es : s.description_en,
+        image: s.image ? (s.image.startsWith("http") ? s.image : `${API}${s.image}`) : null,
+      }))
+    : t.services.items.map(s => ({ title: s.title, desc: s.desc, image: null }));
 
   useEffect(() => {
     const els = sectionRef.current?.querySelectorAll(".reveal") ?? [];
@@ -30,7 +51,7 @@ export default function Services() {
     );
     els.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [items.length]);
 
   return (
     <section id="services" ref={sectionRef} style={{ padding: "120px 0", background: "var(--charcoal)" }}>
@@ -42,63 +63,36 @@ export default function Services() {
               {t.services.label}
             </span>
           </div>
-          <h2 className="reveal" style={{
-            fontFamily: "var(--font-cormorant, serif)",
-            fontSize: "clamp(2.2rem, 5vw, 4rem)",
-            fontWeight: 300, fontStyle: "italic",
-            color: "var(--ivory)", margin: 0, lineHeight: 1.1,
-          }}>
+          <h2 className="reveal" style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 300, fontStyle: "italic", color: "var(--ivory)", margin: 0, lineHeight: 1.1 }}>
             {t.services.title}
           </h2>
         </div>
 
         {/* Service grid */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 340px), 1fr))",
-          gap: "1px",
-          background: "var(--border)",
-        }}>
-          {t.services.items.map((item, i) => (
-            <div
-              key={i}
-              className="reveal service-card"
-              style={{ transitionDelay: `${(i % 3) * 0.08}s` }}
-            >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 340px), 1fr))", gap: "1px", background: "var(--border)" }}>
+          {items.map((item, i) => (
+            <div key={i} className="reveal service-card" style={{ transitionDelay: `${(i % 3) * 0.08}s` }}>
               {/* Photo */}
               <div style={{ position: "relative", height: "200px", overflow: "hidden" }}>
-                <Image
-                  src={PHOTOS[i] || PHOTOS[0]}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.image || FALLBACK_PHOTOS[i % FALLBACK_PHOTOS.length]}
                   alt={item.title}
-                  fill
+                  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s cubic-bezier(0.23,1,0.32,1)" }}
                   className="card-photo"
-                  style={{ objectFit: "cover" }}
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  loading="lazy"
                 />
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: "linear-gradient(180deg, transparent 30%, rgba(10,8,5,0.85) 100%)",
-                }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 30%, rgba(10,8,5,0.85) 100%)" }} />
                 {/* Number */}
-                <div style={{
-                  position: "absolute", top: "14px", right: "14px",
-                  fontFamily: "var(--font-cormorant, serif)",
-                  fontSize: "13px", fontWeight: 300, color: "rgba(201,168,76,0.5)",
-                  letterSpacing: "0.1em",
-                }}>
-                  {NUMBERS[i]}
+                <div style={{ position: "absolute", top: "14px", right: "14px", fontFamily: "var(--font-cormorant, serif)", fontSize: "13px", fontWeight: 300, color: "rgba(201,168,76,0.5)", letterSpacing: "0.1em" }}>
+                  {NUMBERS[i] || String(i + 1).padStart(2, "0")}
                 </div>
               </div>
 
               {/* Text */}
               <div style={{ padding: "24px" }}>
-                {/* Crimson top border */}
                 <div style={{ width: "28px", height: "2px", background: "var(--crimson)", marginBottom: "14px" }} />
-                <h3 style={{
-                  fontFamily: "var(--font-cormorant, serif)",
-                  fontSize: "1.3rem", fontWeight: 600,
-                  color: "var(--ivory)", margin: "0 0 8px", lineHeight: 1.2,
-                }}>
+                <h3 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "1.3rem", fontWeight: 600, color: "var(--ivory)", margin: "0 0 8px", lineHeight: 1.2 }}>
                   {item.title}
                 </h3>
                 <p style={{ color: "var(--steel)", fontSize: "13px", lineHeight: 1.7, margin: 0 }}>
