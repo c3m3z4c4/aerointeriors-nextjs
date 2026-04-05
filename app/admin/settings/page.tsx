@@ -137,14 +137,14 @@ export default function SettingsPage() {
       {/* Add Admin Modal */}
       {showAddAdmin && (
         <Modal title={t.admin.addAdmin} onClose={() => setShowAddAdmin(false)}>
-          <AddAdminForm t={t.admin} onSave={addAdmin} onCancel={() => setShowAddAdmin(false)} />
+          <AddAdminForm onSave={addAdmin} onCancel={() => setShowAddAdmin(false)} />
         </Modal>
       )}
 
       {/* Reset Password Modal */}
       {resetTarget && (
         <Modal title={`${t.admin.resetPassword} — ${resetTarget.name}`} onClose={() => setResetTarget(null)}>
-          <ResetPasswordForm t={t.admin} onSave={pw => resetPassword(resetTarget.id, pw)} onCancel={() => setResetTarget(null)} />
+          <ResetPasswordForm onSave={pw => resetPassword(resetTarget.id, pw)} onCancel={() => setResetTarget(null)} />
         </Modal>
       )}
     </div>
@@ -174,8 +174,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function AddAdminForm({ t: tRaw, onSave, onCancel }: { t: Record<string, unknown>; onSave: (d: { name: string; email: string; password: string }) => void; onCancel: () => void }) {
-  const t = tRaw as Record<string, string>;
+function AddAdminForm({ onSave, onCancel }: { onSave: (d: { name: string; email: string; password: string }) => void; onCancel: () => void }) {
+  const { t: { admin: t } } = useLang();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
   return (
@@ -191,8 +191,8 @@ function AddAdminForm({ t: tRaw, onSave, onCancel }: { t: Record<string, unknown
   );
 }
 
-function ResetPasswordForm({ t: tRaw, onSave, onCancel }: { t: Record<string, unknown>; onSave: (pw: string) => void; onCancel: () => void }) {
-  const t = tRaw as Record<string, string>;
+function ResetPasswordForm({ onSave, onCancel }: { onSave: (pw: string) => void; onCancel: () => void }) {
+  const { t: { admin: t } } = useLang();
   const [pw, setPw] = useState("");
   return (
     <form onSubmit={e => { e.preventDefault(); onSave(pw); }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

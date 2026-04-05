@@ -217,14 +217,14 @@ export default function CrmPage() {
       {/* Client Form Modal */}
       {showClientForm && (
         <Modal title={editingClient ? t.admin.edit : t.admin.newClient} onClose={() => { setShowClientForm(false); setEditingClient(null); }}>
-          <ClientForm initial={editingClient} onSave={saveClient} onCancel={() => { setShowClientForm(false); setEditingClient(null); }} t={t.admin} />
+          <ClientForm initial={editingClient} onSave={saveClient} onCancel={() => { setShowClientForm(false); setEditingClient(null); }} />
         </Modal>
       )}
 
       {/* Quote Form Modal */}
       {showQuoteForm && selected && (
         <Modal title={editingQuote ? t.admin.edit : t.admin.newQuote} onClose={() => { setShowQuoteForm(false); setEditingQuote(null); }}>
-          <QuoteForm initial={editingQuote} onSave={saveQuote} onCancel={() => { setShowQuoteForm(false); setEditingQuote(null); }} t={t.admin} />
+          <QuoteForm initial={editingQuote} onSave={saveQuote} onCancel={() => { setShowQuoteForm(false); setEditingQuote(null); }} />
         </Modal>
       )}
     </div>
@@ -254,8 +254,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function ClientForm({ initial, onSave, onCancel, t: tRaw }: { initial: Client | null; onSave: (d: Partial<Client>) => void; onCancel: () => void; t: Record<string, unknown> }) {
-  const t = tRaw as Record<string, string>;
+function ClientForm({ initial, onSave, onCancel }: { initial: Client | null; onSave: (d: Partial<Client>) => void; onCancel: () => void }) {
+  const { t: { admin: t } } = useLang();
   const [form, setForm] = useState({ name: initial?.name || "", email: initial?.email || "", phone: initial?.phone || "", company: initial?.company || "", notes: initial?.notes || "", status: initial?.status || "prospect" });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
   return (
@@ -280,8 +280,8 @@ function ClientForm({ initial, onSave, onCancel, t: tRaw }: { initial: Client | 
   );
 }
 
-function QuoteForm({ initial, onSave, onCancel, t: tRaw }: { initial: Quote | null; onSave: (d: Partial<Quote>) => void; onCancel: () => void; t: Record<string, unknown> }) {
-  const t = tRaw as Record<string, string>;
+function QuoteForm({ initial, onSave, onCancel }: { initial: Quote | null; onSave: (d: Partial<Quote>) => void; onCancel: () => void }) {
+  const { t: { admin: t } } = useLang();
   const [form, setForm] = useState({
     title: initial?.title || "",
     amount: initial?.amount?.toString() || "",
