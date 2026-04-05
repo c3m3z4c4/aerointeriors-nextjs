@@ -40,7 +40,7 @@ export default function About() {
           <div className="reveal" style={{ position: "relative", aspectRatio: "3/4", maxHeight: "600px" }}>
             <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
               <Image
-                src="/assets/pics/20190701_111357.jpg"
+                src="/assets/pics/webp/20190701_111357.webp"
                 alt="Aircraft interior craftsmanship"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}

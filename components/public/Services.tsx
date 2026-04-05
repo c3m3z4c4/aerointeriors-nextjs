@@ -5,15 +5,15 @@ import { useLang } from "@/lib/i18n/LangContext";
 import Image from "next/image";
 
 const PHOTOS = [
-  "/assets/pics/20190701_161734.jpg",
-  "/assets/pics/20190701_161810.jpg",
-  "/assets/pics/20190701_161812.jpg",
-  "/assets/pics/20190701_165842.jpg",
-  "/assets/pics/20190701_111200.jpg",
-  "/assets/pics/20190701_111212.jpg",
-  "/assets/pics/20190701_111218.jpg",
-  "/assets/pics/20190701_111232.jpg",
-  "/assets/pics/20190701_111251.jpg",
+  "/assets/pics/webp/20190701_161734.webp",
+  "/assets/pics/webp/20190701_161810.webp",
+  "/assets/pics/webp/20190701_161812.webp",
+  "/assets/pics/webp/20190701_165842.webp",
+  "/assets/pics/webp/20190701_111200.webp",
+  "/assets/pics/webp/20190701_111212.webp",
+  "/assets/pics/webp/20190701_111218.webp",
+  "/assets/pics/webp/20190701_111232.webp",
+  "/assets/pics/webp/20190701_111251.webp",
 ];
 
 const NUMBERS = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];

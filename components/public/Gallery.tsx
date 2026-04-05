@@ -6,21 +6,21 @@ import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const GALLERY = [
-  { src: "/assets/pics/20190701_111200.jpg", aspect: "portrait" },
-  { src: "/assets/pics/20190701_111212.jpg", aspect: "landscape" },
-  { src: "/assets/pics/20190701_111218.jpg", aspect: "square" },
-  { src: "/assets/pics/20190701_111232.jpg", aspect: "portrait" },
-  { src: "/assets/pics/20190701_111251.jpg", aspect: "landscape" },
-  { src: "/assets/pics/20190701_111304.jpg", aspect: "square" },
-  { src: "/assets/pics/20190701_111311.jpg", aspect: "portrait" },
-  { src: "/assets/pics/20190701_111324.jpg", aspect: "landscape" },
-  { src: "/assets/pics/20190701_111357.jpg", aspect: "square" },
-  { src: "/assets/pics/20190701_111414.jpg", aspect: "portrait" },
-  { src: "/assets/pics/20190701_111427.jpg", aspect: "landscape" },
-  { src: "/assets/pics/20190701_161734.jpg", aspect: "square" },
-  { src: "/assets/pics/20190701_161810.jpg", aspect: "portrait" },
-  { src: "/assets/pics/20190701_161812.jpg", aspect: "landscape" },
-  { src: "/assets/pics/20190701_165842.jpg", aspect: "square" },
+  { src: "/assets/pics/webp/20190701_111200.webp", aspect: "portrait" },
+  { src: "/assets/pics/webp/20190701_111212.webp", aspect: "landscape" },
+  { src: "/assets/pics/webp/20190701_111218.webp", aspect: "square" },
+  { src: "/assets/pics/webp/20190701_111232.webp", aspect: "portrait" },
+  { src: "/assets/pics/webp/20190701_111251.webp", aspect: "landscape" },
+  { src: "/assets/pics/webp/20190701_111304.webp", aspect: "square" },
+  { src: "/assets/pics/webp/20190701_111311.webp", aspect: "portrait" },
+  { src: "/assets/pics/webp/20190701_111324.webp", aspect: "landscape" },
+  { src: "/assets/pics/webp/20190701_111357.webp", aspect: "square" },
+  { src: "/assets/pics/webp/20190701_111414.webp", aspect: "portrait" },
+  { src: "/assets/pics/webp/20190701_111427.webp", aspect: "landscape" },
+  { src: "/assets/pics/webp/20190701_161734.webp", aspect: "square" },
+  { src: "/assets/pics/webp/20190701_161810.webp", aspect: "portrait" },
+  { src: "/assets/pics/webp/20190701_161812.webp", aspect: "landscape" },
+  { src: "/assets/pics/webp/20190701_165842.webp", aspect: "square" },
 ];
 
 export default function Gallery() {
