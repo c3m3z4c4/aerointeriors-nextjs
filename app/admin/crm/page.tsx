@@ -254,7 +254,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function ClientForm({ initial, onSave, onCancel, t }: { initial: Client | null; onSave: (d: Partial<Client>) => void; onCancel: () => void; t: Record<string, string> }) {
+function ClientForm({ initial, onSave, onCancel, t: tRaw }: { initial: Client | null; onSave: (d: Partial<Client>) => void; onCancel: () => void; t: Record<string, unknown> }) {
+  const t = tRaw as Record<string, string>;
   const [form, setForm] = useState({ name: initial?.name || "", email: initial?.email || "", phone: initial?.phone || "", company: initial?.company || "", notes: initial?.notes || "", status: initial?.status || "prospect" });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
   return (
@@ -279,7 +280,8 @@ function ClientForm({ initial, onSave, onCancel, t }: { initial: Client | null; 
   );
 }
 
-function QuoteForm({ initial, onSave, onCancel, t }: { initial: Quote | null; onSave: (d: Partial<Quote>) => void; onCancel: () => void; t: Record<string, string> }) {
+function QuoteForm({ initial, onSave, onCancel, t: tRaw }: { initial: Quote | null; onSave: (d: Partial<Quote>) => void; onCancel: () => void; t: Record<string, unknown> }) {
+  const t = tRaw as Record<string, string>;
   const [form, setForm] = useState({
     title: initial?.title || "",
     amount: initial?.amount?.toString() || "",

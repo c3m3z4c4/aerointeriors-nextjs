@@ -174,7 +174,8 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-function AddAdminForm({ t, onSave, onCancel }: { t: Record<string, string>; onSave: (d: { name: string; email: string; password: string }) => void; onCancel: () => void }) {
+function AddAdminForm({ t: tRaw, onSave, onCancel }: { t: Record<string, unknown>; onSave: (d: { name: string; email: string; password: string }) => void; onCancel: () => void }) {
+  const t = tRaw as Record<string, string>;
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
   return (
@@ -190,7 +191,8 @@ function AddAdminForm({ t, onSave, onCancel }: { t: Record<string, string>; onSa
   );
 }
 
-function ResetPasswordForm({ t, onSave, onCancel }: { t: Record<string, string>; onSave: (pw: string) => void; onCancel: () => void }) {
+function ResetPasswordForm({ t: tRaw, onSave, onCancel }: { t: Record<string, unknown>; onSave: (pw: string) => void; onCancel: () => void }) {
+  const t = tRaw as Record<string, string>;
   const [pw, setPw] = useState("");
   return (
     <form onSubmit={e => { e.preventDefault(); onSave(pw); }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

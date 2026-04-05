@@ -293,10 +293,11 @@ function YearView({ ref_, apptsByDay, onMonthClick }: { ref_: Date; apptsByDay: 
   );
 }
 
-function AppointmentModal({ initial, defaultDate, clients, t, onSave, onClose }: {
+function AppointmentModal({ initial, defaultDate, clients, t: tRaw, onSave, onClose }: {
   initial: Appointment | null; defaultDate: Date; clients: Client[];
-  t: Record<string, string>; onSave: (d: Partial<Appointment> & { date: string }) => void; onClose: () => void;
+  t: Record<string, unknown>; onSave: (d: Partial<Appointment> & { date: string }) => void; onClose: () => void;
 }) {
+  const t = tRaw as Record<string, string>;
   const localDt = (d: Date) => { const s = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString(); return s.slice(0, 16); };
   const [form, setForm] = useState({
     title: initial?.title || "",
