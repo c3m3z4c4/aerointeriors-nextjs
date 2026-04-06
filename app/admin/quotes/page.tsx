@@ -81,7 +81,11 @@ export default function QuotesPage() {
   async function downloadPdf(q: Quote) {
     try {
       const res = await fetch(`${API}/api/crm/quotes/${q.id}/pdf`, { method: "POST", headers: authH() });
-      if (!res.ok) { toast.error(`PDF error: ${res.status}`); return; }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(`PDF error ${res.status}: ${body.error || "unknown"}`);
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

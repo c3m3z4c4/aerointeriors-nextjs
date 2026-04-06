@@ -91,7 +91,11 @@ export default function InvoicesPage() {
   async function downloadPdf(id: string) {
     try {
       const res = await fetch(`${API}/api/invoices/${id}/pdf`, { method: "POST", headers: authH() });
-      if (!res.ok) { toast.error(`PDF error: ${res.status}`); return; }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error(`PDF error ${res.status}: ${body.error || "unknown"}`);
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const inv = invoices.find(i => i.id === id);
