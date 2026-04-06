@@ -262,7 +262,10 @@ function ClientForm({ initial, onSave, onCancel }: { initial: Client | null; onS
     <form onSubmit={e => { e.preventDefault(); onSave(form); }} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <Field label={t.name} required><input value={form.name} onChange={set("name")} className="field" required /></Field>
       <Field label={t.email}><input type="email" value={form.email} onChange={set("email")} className="field" /></Field>
-      <Field label={t.phone}><input value={form.phone} onChange={set("phone")} className="field" /></Field>
+      <Field label={t.phone}>
+        <input value={form.phone} onChange={set("phone")} className="field" placeholder="+1 555 123 4567" />
+        <span style={{ fontSize: "10px", color: "var(--steel)", marginTop: "4px", display: "block" }}>Include country code, e.g. +1 555 123 4567</span>
+      </Field>
       <Field label={t.company}><input value={form.company} onChange={set("company")} className="field" /></Field>
       <Field label={t.status}>
         <select value={form.status} onChange={set("status")} className="field">

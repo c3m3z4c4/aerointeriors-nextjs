@@ -138,7 +138,10 @@ export default function Contact() {
                 <label style={{ fontSize: "9.5px", letterSpacing: "0.22em", color: "var(--steel)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
                   {t.contact.phone}
                 </label>
-                <input {...register("phone")} type="tel" className="field" />
+                <input {...register("phone")} type="tel" className="field" placeholder="+1 555 123 4567" />
+                <span style={{ fontSize: "10px", color: "var(--steel)", marginTop: "4px", display: "block" }}>
+                  Include country code, e.g. +1 555 123 4567
+                </span>
               </div>
               <div>
                 <label style={{ fontSize: "9.5px", letterSpacing: "0.22em", color: "var(--steel)", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
