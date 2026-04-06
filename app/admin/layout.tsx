@@ -6,12 +6,14 @@ import { getToken, clearToken } from "@/lib/auth";
 import { useLang } from "@/lib/i18n/LangContext";
 import Link from "next/link";
 import Image from "next/image";
-import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings, Images } from "lucide-react";
+import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings, Images, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/public/Header";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useLang();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [checked, setChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -37,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   const Sidebar = () => (
-    <aside style={{
+    <aside className="admin-panel-sidebar" style={{
       width: "220px", flexShrink: 0,
       background: "var(--surface)",
       borderRight: "1px solid var(--border)",
@@ -48,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Brand */}
       <div style={{ padding: "28px 24px", borderBottom: "1px solid var(--border)" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
-          <Image src="/assets/img/AvionAPN.png" alt="AIS" width={26} height={26} style={{ objectFit: "contain" }} />
+          <Image src="/assets/img/AvionAPN.png" alt="AIS" width={26} height={26} className="admin-logo-img" style={{ objectFit: "contain" }} />
           <div>
             <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--ivory)", letterSpacing: "0.1em", fontFamily: "var(--font-cormorant, serif)" }}>AIRCRAFT</div>
             <div style={{ fontSize: "7px", letterSpacing: "0.18em", color: "var(--gold)" }}>INTERIORS</div>
@@ -130,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {/* Topbar */}
-        <header style={{
+        <header className="admin-panel-topbar" style={{
           height: "56px", flexShrink: 0,
           background: "var(--surface)",
           borderBottom: "1px solid var(--border)",
@@ -147,12 +149,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "16px", color: "var(--ivory)", fontStyle: "italic" }}>
             {navItems.find((n) => n.href === pathname)?.label || "Admin"}
           </span>
-          {/* Crimson dot indicator */}
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--crimson)", marginLeft: "auto" }} />
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              style={{
+                background: "none", border: "1px solid var(--border)", color: "var(--steel)",
+                cursor: "pointer", padding: "6px 8px", display: "flex", alignItems: "center",
+                gap: "6px", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase",
+                transition: "border-color 0.2s, color 0.2s",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--gold)"; (e.currentTarget as HTMLElement).style.color = "var(--gold)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.color = "var(--steel)"; }}
+            >
+              {theme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
+              {theme === "dark" ? "Day" : "Night"}
+            </button>
+            {/* Crimson dot */}
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--crimson)" }} />
+          </div>
         </header>
 
         {/* Content */}
-        <main style={{ flex: 1, overflow: "auto", padding: "32px" }}>
+        <main className="admin-panel-body" style={{ flex: 1, overflow: "auto", padding: "32px" }}>
           {children}
         </main>
       </div>

@@ -52,8 +52,13 @@
 [data-theme="light"] .field::placeholder { color: rgba(26,20,16,0.35); }
 [data-theme="light"] .field option { background: #fff; color: var(--ivory); }
 
-[data-theme="light"] .kanban-col { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-[data-theme="light"] .kanban-item { background: #f8f5f0; }
+/* Admin surfaces in light mode */
+[data-theme="light"] .admin-panel-body { background: #f2ede5 !important; }
+[data-theme="light"] [style*="background: var(--surface)"],
+[data-theme="light"] [style*='background:"var(--surface)"'] {
+  background: #fff !important;
+}
+[data-theme="light"] [style*="background: var(--surface-2)"] { background: #f0ece4 !important; }
 
 [data-theme="light"] ::-webkit-scrollbar-track { background: var(--void); }
 [data-theme="light"] ::selection { background: var(--crimson); color: #fff; }
@@ -162,22 +167,61 @@ body {
 .field::placeholder { color: rgba(245,240,232,0.28); }
 .field option { background: var(--surface); color: var(--ivory); }
 
+/* Admin logo */
+.admin-logo-img { filter: brightness(0) invert(1); opacity: 0.9; }
+[data-theme="light"] .admin-logo-img { filter: none; opacity: 1; }
+
+/* Admin panel overrides — tighter, cleaner contrast */
+.admin-panel-sidebar {
+  background: #111009 !important;
+  border-right: 1px solid rgba(201,168,76,0.18) !important;
+}
+[data-theme="light"] .admin-panel-sidebar {
+  background: #f0ece4 !important;
+  border-right: 1px solid rgba(187,35,25,0.12) !important;
+}
+
+.admin-panel-topbar {
+  background: #161209 !important;
+  border-bottom: 1px solid rgba(201,168,76,0.15) !important;
+}
+[data-theme="light"] .admin-panel-topbar {
+  background: #fff !important;
+  border-bottom: 1px solid rgba(187,35,25,0.1) !important;
+}
+
+.admin-panel-body {
+  background: #0d0b07 !important;
+}
+[data-theme="light"] .admin-panel-body {
+  background: #f8f5f0 !important;
+}
+
 /* Kanban */
 .kanban-col {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #1a1510;
+  border: 1px solid rgba(201,168,76,0.18);
   min-height: 480px;
   padding: 20px;
   border-radius: 2px;
 }
+[data-theme="light"] .kanban-col {
+  background: #fff;
+  border: 1px solid rgba(187,35,25,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
 .kanban-item {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: #241e16;
+  border: 1px solid rgba(201,168,76,0.14);
   border-radius: 2px; padding: 14px;
   cursor: grab;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.kanban-item:hover { border-color: rgba(187,35,25,0.3); }
+[data-theme="light"] .kanban-item {
+  background: #f8f5f0;
+  border: 1px solid rgba(187,35,25,0.1);
+}
+.kanban-item:hover { border-color: rgba(187,35,25,0.4); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
 .kanban-item.dragging {
   box-shadow: 0 24px 48px rgba(0,0,0,0.7);
   cursor: grabbing; z-index: 1000;
