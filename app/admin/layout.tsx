@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { getToken, clearToken } from "@/lib/auth";
 import { useLang } from "@/lib/i18n/LangContext";
+import type { Lang } from "@/lib/i18n/translations";
 import Link from "next/link";
 import Image from "next/image";
-import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings, Images, Sun, Moon, Database, Receipt } from "lucide-react";
+import { MessageSquare, Kanban, LogOut, LayoutDashboard, Menu, Users, CalendarDays, FileText, Settings, Images, Sun, Moon, Database, Receipt, ClipboardList } from "lucide-react";
 import { useTheme } from "@/components/public/Header";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useLang();
+  const { t, lang, setLang } = useLang();
   const { theme, toggle: toggleTheme } = useTheme();
   const [checked, setChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,8 +34,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/kanban", label: t.admin.kanban, icon: <Kanban size={16} /> },
     { href: "/admin/crm", label: t.admin.crm, icon: <Users size={16} /> },
     { href: "/admin/appointments", label: t.admin.appointments, icon: <CalendarDays size={16} /> },
-    { href: "/admin/portfolio", label: t.admin.portfolio, icon: <Images size={16} /> },
+    { href: "/admin/quotes",   label: t.admin.quotes,   icon: <ClipboardList size={16} /> },
     { href: "/admin/invoices", label: t.admin.invoices, icon: <Receipt size={16} /> },
+    { href: "/admin/portfolio", label: t.admin.portfolio, icon: <Images size={16} /> },
     { href: "/admin/content", label: t.admin.content, icon: <FileText size={16} /> },
     { href: "/admin/backup", label: t.admin.backup, icon: <Database size={16} /> },
     { href: "/admin/settings", label: t.admin.settings, icon: <Settings size={16} /> },
@@ -151,22 +153,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "16px", color: "var(--ivory)", fontStyle: "italic" }}>
             {navItems.find((n) => n.href === pathname)?.label || "Admin"}
           </span>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
+            {/* Language toggle */}
+            <div style={{ display: "flex", border: "1px solid var(--border)", overflow: "hidden" }}>
+              {(["en", "es"] as Lang[]).map(l => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  style={{
+                    padding: "5px 10px", border: "none", cursor: "pointer",
+                    fontSize: "10px", letterSpacing: "0.12em", fontWeight: 600,
+                    background: lang === l ? "var(--crimson)" : "transparent",
+                    color: lang === l ? "var(--ivory)" : "var(--steel)",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               style={{
                 background: "none", border: "1px solid var(--border)", color: "var(--steel)",
-                cursor: "pointer", padding: "6px 8px", display: "flex", alignItems: "center",
-                gap: "6px", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase",
+                cursor: "pointer", padding: "5px 8px", display: "flex", alignItems: "center",
+                gap: "5px", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase",
                 transition: "border-color 0.2s, color 0.2s",
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--gold)"; (e.currentTarget as HTMLElement).style.color = "var(--gold)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLElement).style.color = "var(--steel)"; }}
             >
               {theme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
-              {theme === "dark" ? "Day" : "Night"}
             </button>
             {/* Crimson dot */}
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--crimson)" }} />
