@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLang } from "@/lib/i18n/LangContext";
 import { getToken } from "@/lib/auth";
+import { toast } from "sonner";
 import { Plus, X, FileText, Trash2, Pencil, Download, ChevronDown, ChevronUp } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "";
@@ -78,14 +79,18 @@ export default function QuotesPage() {
   }
 
   async function downloadPdf(q: Quote) {
-    const res = await fetch(`${API}/api/crm/quotes/${q.id}/pdf`, { method: "POST", headers: authH() });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `${q.quoteNumber || q.id}.pdf`; a.click();
-    URL.revokeObjectURL(url);
-    await load();
+    try {
+      const res = await fetch(`${API}/api/crm/quotes/${q.id}/pdf`, { method: "POST", headers: authH() });
+      if (!res.ok) { toast.error(`PDF error: ${res.status}`); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${q.quoteNumber || q.id}.pdf`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("PDF downloaded");
+      await load();
+    } catch (e) { toast.error("PDF download failed"); }
   }
 
   const visible = filter === "all" ? quotes : quotes.filter(q => q.status === filter);
@@ -398,7 +403,7 @@ function QuoteModal({ initial, clients, onSave, onClose }: {
               <Field label={i === 0 ? t.service : undefined}><input value={item.service} onChange={e => updateItem(i, "service", e.target.value)} className="field" placeholder="Service" /></Field>
               <Field label={i === 0 ? "Description" : undefined}><input value={item.description} onChange={e => updateItem(i, "description", e.target.value)} className="field" /></Field>
               <Field label={i === 0 ? t.qty : undefined}><input type="number" value={item.qty} onChange={e => updateItem(i, "qty", e.target.value)} className="field" min="0" step="0.5" /></Field>
-              <Field label={i === 0 ? t.unitPrice : undefined}><input type="number" value={item.unitPrice} onChange={e => updateItem(i, "unitPrice", e.target.value)} className="field" step="0.01" /></Field>
+              <Field label={i === 0 ? t.unitPrice : undefined}><input type="number" value={item.unitPrice} onChange={e => updateItem(i, "unitPrice", e.target.value)} className="field" step="0.01" min="0" /></Field>
               <Field label={i === 0 ? "Total" : undefined}><input type="number" value={item.total.toFixed(2)} readOnly className="field" style={{ color: "var(--gold)" }} /></Field>
               <button type="button" onClick={() => { const n = items.filter((_, j) => j !== i); setItems(n); recalc(n); }} style={{ ...iconBtn, color: "var(--crimson)", marginBottom: "4px" }}><X size={14} /></button>
             </div>
@@ -410,13 +415,13 @@ function QuoteModal({ initial, clients, onSave, onClose }: {
           <ST label="Financial Summary" />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: "12px" }}>
             <Field label={t.currency}><select value={form.currency} onChange={set("currency")} className="field">{["USD","EUR","MXN","CAD","GBP"].map(c => <option key={c} value={c}>{c}</option>)}</select></Field>
-            <Field label={t.subtotal}><input type="number" step="0.01" value={form.subtotal} onChange={set("subtotal")} className="field" /></Field>
-            <Field label={`${t.taxRate} (%)`}><input type="number" step="0.01" value={form.taxRate} onChange={set("taxRate")} className="field" placeholder="8.5" /></Field>
-            <Field label={t.discount}><input type="number" step="0.01" value={form.discount} onChange={set("discount")} className="field" /></Field>
-            <Field label={t.total}><input type="number" step="0.01" value={form.total} onChange={set("total")} className="field" style={{ color: "var(--gold)", fontWeight: 600 }} /></Field>
+            <Field label={t.subtotal}><input type="number" step="0.01" min="0" value={form.subtotal} onChange={set("subtotal")} className="field" /></Field>
+            <Field label={`${t.taxRate} (%)`}><input type="number" step="0.01" min="0" value={form.taxRate} onChange={set("taxRate")} className="field" placeholder="8.5" /></Field>
+            <Field label={t.discount}><input type="number" step="0.01" min="0" value={form.discount} onChange={set("discount")} className="field" /></Field>
+            <Field label={t.total}><input type="number" step="0.01" min="0" value={form.total} onChange={set("total")} className="field" style={{ color: "var(--gold)", fontWeight: 600 }} /></Field>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-            <Field label={t.depositRequired}><input type="number" step="0.01" value={form.depositRequired} onChange={set("depositRequired")} className="field" /></Field>
+            <Field label={t.depositRequired}><input type="number" step="0.01" min="0" value={form.depositRequired} onChange={set("depositRequired")} className="field" /></Field>
             <Field label={t.paymentTerms}>
               <select value={form.paymentTerms} onChange={set("paymentTerms")} className="field">
                 {["Net 15","Net 30","Net 45","Net 60","Due on Delivery","50% Deposit / 50% on Completion"].map(p => <option key={p} value={p}>{p}</option>)}

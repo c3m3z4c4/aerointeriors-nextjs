@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLang } from "@/lib/i18n/LangContext";
 import { getToken } from "@/lib/auth";
 import { Plus, X, FileText, Trash2, Pencil, Download } from "lucide-react";
+import { toast } from "sonner";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "";
 const ORG = process.env.NEXT_PUBLIC_ORG_ID || "";
@@ -88,13 +89,19 @@ export default function InvoicesPage() {
   }
 
   async function downloadPdf(id: string) {
-    const res = await fetch(`${API}/api/invoices/${id}/pdf`, { method: "POST", headers: authH() });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = `invoice-${id}.pdf`; a.click();
-    URL.revokeObjectURL(url);
-    await load();
+    try {
+      const res = await fetch(`${API}/api/invoices/${id}/pdf`, { method: "POST", headers: authH() });
+      if (!res.ok) { toast.error(`PDF error: ${res.status}`); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const inv = invoices.find(i => i.id === id);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${inv?.invoiceNumber || id}.pdf`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("PDF downloaded");
+      await load();
+    } catch { toast.error("PDF download failed"); }
   }
 
   const visible = filter === "all" ? invoices : invoices.filter(i => i.status === filter);
@@ -391,7 +398,7 @@ function InvoiceModal({ initial, clients, quotes, onSave, onClose }: {
                 <input type="number" value={item.qty} onChange={e => updateItem(i, "qty", e.target.value)} className="field" min="0" step="0.5" />
               </Field>
               <Field label={i === 0 ? t.unitPrice : undefined}>
-                <input type="number" value={item.unitPrice} onChange={e => updateItem(i, "unitPrice", e.target.value)} className="field" step="0.01" />
+                <input type="number" value={item.unitPrice} onChange={e => updateItem(i, "unitPrice", e.target.value)} className="field" step="0.01" min="0" />
               </Field>
               <Field label={i === 0 ? "Total" : undefined}>
                 <input type="number" value={item.total.toFixed(2)} readOnly className="field" style={{ color: "var(--gold)" }} />
@@ -410,15 +417,15 @@ function InvoiceModal({ initial, clients, quotes, onSave, onClose }: {
                 {["USD","EUR","MXN","CAD","GBP"].map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </Field>
-            <Field label={t.subtotal}><input type="number" step="0.01" value={form.subtotal} onChange={set("subtotal")} className="field" /></Field>
-            <Field label={t.taxRate + " (%)"}><input type="number" step="0.01" value={form.taxRate} onChange={set("taxRate")} className="field" placeholder="8.5" /></Field>
-            <Field label={t.discount}><input type="number" step="0.01" value={form.discount} onChange={set("discount")} className="field" /></Field>
+            <Field label={t.subtotal}><input type="number" step="0.01" min="0" value={form.subtotal} onChange={set("subtotal")} className="field" /></Field>
+            <Field label={t.taxRate + " (%)"}><input type="number" step="0.01" min="0" value={form.taxRate} onChange={set("taxRate")} className="field" placeholder="8.5" /></Field>
+            <Field label={t.discount}><input type="number" step="0.01" min="0" value={form.discount} onChange={set("discount")} className="field" /></Field>
             <Field label={t.total}>
-              <input type="number" step="0.01" value={form.total} onChange={set("total")} className="field" style={{ color: "var(--gold)", fontWeight: 600 }} />
+              <input type="number" step="0.01" min="0" value={form.total} onChange={set("total")} className="field" style={{ color: "var(--gold)", fontWeight: 600 }} />
             </Field>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-            <Field label={t.amountPaid}><input type="number" step="0.01" value={form.amountPaid} onChange={set("amountPaid")} className="field" /></Field>
+            <Field label={t.amountPaid}><input type="number" step="0.01" min="0" value={form.amountPaid} onChange={set("amountPaid")} className="field" /></Field>
             <Field label={t.paymentTerms}>
               <select value={form.paymentTerms} onChange={set("paymentTerms")} className="field">
                 {["Net 15","Net 30","Net 45","Net 60","Due on Receipt","Net 90"].map(p => <option key={p} value={p}>{p}</option>)}
